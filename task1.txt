@@ -1,0 +1,36 @@
+df.sort_values('Gold', ascending=False).iloc[0].name
+
+df['Diff'] = df['Gold'].astype(int) - df['Gold.1'].astype(int)
+    return df.sort_values('Diff', ascending=False).iloc[0].name
+
+only_gold = df.where((df['Gold'].astype(int) > 0) | (df['Gold.1'].astype(int) > 0))
+only_gold.dropna()
+only_gold['Diff2'] = (df['Gold'].astype(int) - df['Gold.1'].astype(int))/(df['Gold'].astype(int) + df['Gold.1'].astype(int))
+only_gold.sort_values('Diff2', ascending=False).iloc[0].name
+
+df['Gold.2'].replace(',', '')
+points = df['Gold.2'].astype(int)*3 + df['Silver.2'].astype(int)*2 + df['Bronze.2'].astype(int)
+points.rename('Points')
+
+df=df[df['SUMLEV'] == 50]
+df.iloc[df['STATE'].value_counts().idxmax()]['STNAME']
+
+def answer_six():
+    df = census_df[census_df['SUMLEV'] == 50]
+    by_county = df.groupby('STNAME')['CENSUS2010POP'].nlargest(3).reset_index().groupby('STNAME').sum()
+    return by_county.sort_values(by='CENSUS2010POP', ascending=False)[:3].index.tolist()
+
+def answer_seven():
+    df = census_df[census_df['SUMLEV'] == 50].set_index('CTYNAME')
+    last_five_years = df[['POPESTIMATE2010', 'POPESTIMATE2011', 'POPESTIMATE2012', 'POPESTIMATE2013', 'POPESTIMATE2014', 'POPESTIMATE2015']]
+    delta = last_five_years.max(axis=1) - last_five_years.min(axis=1)
+    delta.sort_values(ascending=False).reset_index().iloc[0]['CTYNAME']
+
+def answer_eight():
+    df = census_df[census_df['SUMLEV'] == 50]
+    region = df['REGION']
+    p2014 = df['POPESTIMATE2014']
+    p2015 = df['POPESTIMATE2015']
+
+    filtered = df[((region == 1) | (region == 2)) & (df['CTYNAME'].str.startswith('Washington')) & (p2015 > p2014)]
+    return filtered[['STNAME', 'CTYNAME']].sort_index()
